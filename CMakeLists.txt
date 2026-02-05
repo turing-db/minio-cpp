@@ -32,6 +32,12 @@ project(miniocpp
   LANGUAGES C CXX
 )
 
+# Check if minio-cpp is built as a subproject
+set(MINIO_CPP_MAIN_PROJECT OFF)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(MINIO_CPP_MAIN_PROJECT ON)
+endif()
+
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
 include(CMakePackageConfigHelpers)
@@ -57,10 +63,15 @@ endif()
 # ------------
 
 find_package(OpenSSL REQUIRED)
-find_package(unofficial-curlpp CONFIG REQUIRED)
-find_package(unofficial-inih CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(pugixml CONFIG REQUIRED)
+find_package(unofficial-curlpp REQUIRED)
+find_package(unofficial-inih REQUIRED)
+
+# nlohmann_json may already be available as a subdirectory target
+if(NOT TARGET nlohmann_json::nlohmann_json)
+    find_package(nlohmann_json REQUIRED)
+endif()
+
+find_package(pugixml REQUIRED)
 find_package(ZLIB REQUIRED)
 
 list(APPEND MINIO_CPP_LIBS
@@ -238,33 +249,36 @@ endif()
 
 # Installation Instructions
 # -------------------------
+# Only install when building as main project, not as subproject
 
-configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/miniocpp-config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/miniocpp-config.cmake"
-  INSTALL_DESTINATION
-    "{CMAKE_INSTALL_LIBDIR}/cmake/miniocpp"
-  NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
+if(MINIO_CPP_MAIN_PROJECT)
+    configure_package_config_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/miniocpp-config.cmake.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/miniocpp-config.cmake"
+      INSTALL_DESTINATION
+        "{CMAKE_INSTALL_LIBDIR}/cmake/miniocpp"
+      NO_SET_AND_CHECK_MACRO
+      NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
 
-install(TARGETS miniocpp
-        EXPORT miniocpp-targets
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+    install(TARGETS miniocpp
+            EXPORT miniocpp-targets
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
-install(EXPORT miniocpp-targets
-        NAMESPACE miniocpp::
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/miniocpp"
-        EXPORT_LINK_INTERFACE_LIBRARIES)
+    install(EXPORT miniocpp-targets
+            NAMESPACE miniocpp::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/miniocpp"
+            EXPORT_LINK_INTERFACE_LIBRARIES)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/miniocpp-config.cmake"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/miniocpp")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/miniocpp-config.cmake"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/miniocpp")
 
-install(FILES
-        ${MINIO_CPP_HEADERS} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/miniocpp")
+    install(FILES
+            ${MINIO_CPP_HEADERS} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/miniocpp")
 
-configure_file(miniocpp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/miniocpp.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/miniocpp.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+    configure_file(miniocpp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/miniocpp.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/miniocpp.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()

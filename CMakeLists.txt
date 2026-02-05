@@ -140,6 +140,15 @@ ENDIF ()
 
 target_compile_options(miniocpp PRIVATE ${MINIO_CPP_CFLAGS})
 target_compile_features(miniocpp PUBLIC cxx_std_${MINIO_CPP_STD})
+
+# Fix macOS build with Homebrew LLVM - add explicit libc++ include path
+if(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    get_filename_component(COMPILER_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
+    get_filename_component(LLVM_ROOT ${COMPILER_DIR} DIRECTORY)
+    if(EXISTS "${LLVM_ROOT}/include/c++/v1")
+        target_compile_options(miniocpp PRIVATE -nostdinc++ -isystem ${LLVM_ROOT}/include/c++/v1)
+    endif()
+endif()
 target_include_directories(miniocpp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>

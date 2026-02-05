@@ -394,7 +394,7 @@ PutObjectResponse Client::PutObject(PutObjectArgs args, std::string& upload_id,
     size_t bytes_read = 0;
     if (part_count > 0) {
       if (part_number == part_count) {
-        part_size = object_size - uploaded_size;
+        part_size = static_cast<size_t>(object_size) - uploaded_size;
         stop = true;
       }
 

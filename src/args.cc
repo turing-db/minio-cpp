@@ -298,7 +298,7 @@ PutObjectArgs::PutObjectArgs(std::istream& istream, long object_size,
                              long part_size)
     : stream(istream) {
   this->object_size = object_size;
-  this->part_size = part_size;
+  this->part_size = static_cast<size_t>(part_size);
 }
 
 error::Error PutObjectArgs::Validate() {
@@ -379,7 +379,7 @@ size_t ComposeSource::ObjectSize() const {
     std::terminate();
   }
 
-  return object_size_;
+  return static_cast<size_t>(object_size_);
 }
 
 utils::Multimap ComposeSource::Headers() const {

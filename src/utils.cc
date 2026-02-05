@@ -613,8 +613,8 @@ error::Error CheckBucketName(std::string_view bucket_name, bool strict) {
 
 error::Error ReadPart(std::istream& stream, char* buf, size_t size,
                       size_t& bytes_read) {
-  stream.read(buf, size);
-  bytes_read = stream.gcount();
+  stream.read(buf, static_cast<std::streamsize>(size));
+  bytes_read = static_cast<size_t>(stream.gcount());
   return error::SUCCESS;
 }
 
@@ -653,9 +653,9 @@ error::Error CalcPartInfo(long object_size, size_t& part_size,
     part_size = (size_t)std::ceil(psize / kMinPartSize) * kMinPartSize;
   }
 
-  if (static_cast<long>(part_size) > object_size) part_size = object_size;
+  if (static_cast<long>(part_size) > object_size) part_size = static_cast<size_t>(object_size);
   part_count = static_cast<long>(
-      (part_size > 0) ? ((object_size + part_size - 1) / part_size) : 1);
+      (part_size > 0) ? ((static_cast<size_t>(object_size) + part_size - 1) / part_size) : 1);
   if (part_count > kMaxMultipartCount) {
     return error::Error(
         "object size " + std::to_string(object_size) + " and part size " +

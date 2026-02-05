@@ -1876,7 +1876,7 @@ StatObjectResponse BaseClient::StatObject(StatObjectArgs args) {
   resp.etag = utils::Trim(response.headers.GetFront("etag"), '"');
 
   std::string value = response.headers.GetFront("content-length");
-  if (!value.empty()) resp.size = std::stol(value);
+  if (!value.empty()) resp.size = static_cast<size_t>(std::stol(value));
 
   value = response.headers.GetFront("last-modified");
   if (!value.empty()) {

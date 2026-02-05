@@ -68,7 +68,7 @@ std::string HmacHash(std::string_view key, std::string_view data) {
 
   HMAC(EVP_sha256(), key.data(), static_cast<int>(key.size()),
        reinterpret_cast<unsigned char const*>(data.data()),
-       static_cast<int>(data.size()), hash.data(), &hash_len);
+       data.size(), hash.data(), &hash_len);
 
   return std::string{reinterpret_cast<char const*>(hash.data()), hash_len};
 }

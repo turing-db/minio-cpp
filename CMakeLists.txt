@@ -265,7 +265,7 @@ if(MINIO_CPP_MAIN_PROJECT)
       "${CMAKE_CURRENT_SOURCE_DIR}/miniocpp-config.cmake.in"
       "${CMAKE_CURRENT_BINARY_DIR}/miniocpp-config.cmake"
       INSTALL_DESTINATION
-        "{CMAKE_INSTALL_LIBDIR}/cmake/miniocpp"
+        "${CMAKE_INSTALL_LIBDIR}/cmake/miniocpp"
       NO_SET_AND_CHECK_MACRO
       NO_CHECK_REQUIRED_COMPONENTS_MACRO
     )

@@ -1,0 +1,9 @@
+[submodule "external/inih"]
+	path = external/inih
+	url = https://github.com/benhoyt/inih.git
+[submodule "external/pugixml"]
+	path = external/pugixml
+	url = https://github.com/zeux/pugixml.git
+[submodule "external/curlpp"]
+	path = external/curlpp
+	url = https://github.com/jpbarrette/curlpp.git

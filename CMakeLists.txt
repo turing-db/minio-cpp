@@ -63,22 +63,21 @@ endif()
 # ------------
 
 find_package(OpenSSL REQUIRED)
-find_package(unofficial-curlpp REQUIRED)
-find_package(unofficial-inih REQUIRED)
+
+add_subdirectory(external)
 
 # nlohmann_json may already be available as a subdirectory target
 if(NOT TARGET nlohmann_json::nlohmann_json)
     find_package(nlohmann_json REQUIRED)
 endif()
 
-find_package(pugixml REQUIRED)
 find_package(ZLIB REQUIRED)
 
 list(APPEND MINIO_CPP_LIBS
-  unofficial::curlpp::curlpp
-  unofficial::inih::inireader
-  nlohmann_json::nlohmann_json
+  curlpp
+  inih
   pugixml
+  nlohmann_json::nlohmann_json
   OpenSSL::SSL OpenSSL::Crypto
   ZLIB::ZLIB
 )
@@ -154,6 +153,7 @@ target_include_directories(miniocpp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+
 target_link_libraries(miniocpp PUBLIC ${MINIO_CPP_LIBS})
 set_target_properties(miniocpp PROPERTIES VERSION "${MINIO_CPP_VERSION_STRING}")
 set_target_properties(miniocpp PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -271,7 +271,7 @@ if(MINIO_CPP_MAIN_PROJECT)
       NO_CHECK_REQUIRED_COMPONENTS_MACRO
     )
 
-    install(TARGETS miniocpp
+    install(TARGETS miniocpp curlpp inih
             EXPORT miniocpp-targets
             RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
@@ -288,6 +288,11 @@ if(MINIO_CPP_MAIN_PROJECT)
 
     install(FILES
             ${MINIO_CPP_HEADERS} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/miniocpp")
+
+    # Install headers for bundled dependencies
+    install(FILES external/inih/ini.h external/inih/cpp/INIReader.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+    install(DIRECTORY external/curlpp/include/curlpp DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+    install(DIRECTORY external/curlpp/include/utilspp DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
     configure_file(miniocpp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/miniocpp.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/miniocpp.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

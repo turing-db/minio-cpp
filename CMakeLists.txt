@@ -67,9 +67,7 @@ find_package(OpenSSL REQUIRED)
 add_subdirectory(external)
 
 # nlohmann_json may already be available as a subdirectory target
-if(NOT TARGET nlohmann_json::nlohmann_json)
-    find_package(nlohmann_json REQUIRED)
-endif()
+find_package(nlohmann_json REQUIRED)
 
 find_package(ZLIB REQUIRED)
 
